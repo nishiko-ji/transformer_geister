@@ -21,6 +21,8 @@ class GeisterTokenizer():
     def make_vocab(self) -> dict[str, int]:
         """ vocab(トークンとIDの辞書)を作成
 
+        トークン(str)とID(int)の辞書で語彙を表現する。
+
         Returns:
             dict[str, int]: トークンとIDの辞書(vocab)
 
