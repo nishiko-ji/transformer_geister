@@ -3,7 +3,7 @@ from torch.utils.data import Dataset, DataLoader
 from tokenizer import GeisterTokenizer
 
 
-class CustomDataset(Dataset):
+class GeisterDataset(Dataset):
     def __init__(self, texts: list[str], labels: list[str], vocab_size: int, max_seq_length: int):
         self.texts = texts  # 入力文
         self.labels = labels    # 答えlabel
