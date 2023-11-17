@@ -1,6 +1,6 @@
 import torch
 from torch.utils.data import Dataset, DataLoader
-from tokenizer import GeisterTokenizer
+from src.data.tokenizer import GeisterTokenizer
 
 
 class GeisterDataset(Dataset):
@@ -19,7 +19,7 @@ class GeisterDataset(Dataset):
 
         tokenizer = GeisterTokenizer()  # トークナイザ
         text_tokens = tokenizer.tokenize(text, self.max_seq_length) # トークン化
-        tokenizer.convert_tokens_to_ids(text_tokens)    # IDに変換
+        text_tokens = tokenizer.convert_tokens_to_ids(text_tokens)    # IDに変換
 
         # ラベルを赤駒：1、青駒：0で表現
         label2 = []

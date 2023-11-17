@@ -25,7 +25,7 @@ def get_data(path):
     return texts, labels
 
 
-def train(d_model, nhead, num_layers, batch_size, learning_rate):
+def eval(d_model, nhead, num_layers, batch_size, learning_rate, epoch):
     # torch.cuda.init()
     vocab_size = 84 # 語彙数
     # d_model = 256   # 隠れ層の次元数（256, 512, 1024）
@@ -42,36 +42,40 @@ def train(d_model, nhead, num_layers, batch_size, learning_rate):
     texts, labels = get_data(data_path)
 
     # データローダーのセットアップ
-    train_dataset = GeisterDataset(texts, labels, vocab_size, max_seq_length)
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    eval_dataset = GeisterDataset(texts, labels, vocab_size, max_seq_length)
+    eval_loader = DataLoader(eval_dataset, batch_size=batch_size, shuffle=True)
 
     # モデルの設定
     device = torch.device('cuda:0') if torch.cuda.is_available() else torch.device('cpu')
     print('cuDNNの有効状態：', torch.backends.cudnn.enabled)
 
     model = TransformerMultiClassClassifier(vocab_size, d_model, nhead, num_layers, num_classes).to(device)
-    criterion = nn.BCELoss()
-    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
-    if not os.path.exists(checkpoint_dir):
-        os.makedirs(checkpoint_dir)
+    checkpoint_path = checkpoint_dir + f'ckpt_dmodel_{d_model}_nhead_{nhead}_numlayers_{num_layers}_batch_{batch_size}_rate_{str(learning_rate)[2:]}_epoch_{epoch}.pt'
+    model.load_state_dict(torch.load(checkpoint_path))
+    
+    model.eval()
+    # 予測と正解のリスト
+    all_predictions = []
+    all_ground_truth = []
+    all_outputs = []
 
-    save_interval = 1
-
-    for epoch in range(num_epochs):
-        model.train()
-        for batch_input, batch_labels in train_loader:
+    with torch.no_grad():
+        for batch_input, batch_labels in eval_loader:
             batch_input, batch_labels = batch_input.to(device), batch_labels.to(device)
-            optimizer.zero_grad()
+            # モデルの順伝播（forward）で予測を取得
             outputs = model(batch_input)
-            loss = criterion(outputs, batch_labels)
-            loss.backward()
-            optimizer.step()
+            all_outputs.extend(outputs)
+            predictions = (outputs > 0.5).long()  # しきい値0.5を使用してバイナリ予測に変換
+            all_predictions.extend(predictions.cpu().numpy())
+            all_ground_truth.extend(batch_labels.cpu().numpy())
 
-        if (epoch + 1) % save_interval == 0:
-            checkpoint_filename = os.path.join(checkpoint_dir, f'ckpt_dmodel_{d_model}_nhead_{nhead}_numlayers_{num_layers}_batch_{batch_size}_rate_{str(learning_rate)[2:]}_epoch_{epoch+1}.pt')
-            torch.save(model.state_dict(), checkpoint_filename)
-            print(f'Saved checkpoint at epoch {epoch + 1} to {checkpoint_filename}')
+    # 予測と正解を表示
+    # for prediction, ground_truth in zip(all_predictions, all_ground_truth):
+    #     print(f"Predicted: {prediction}, Ground Truth: {ground_truth}")
+    for prediction, ground_truth in zip(all_outputs, all_ground_truth):
+        print(f"Predicted: {prediction}, Ground Truth: {ground_truth}")
+    
 
 def main():
     d_model_list= [64, 128, 256]
@@ -79,13 +83,15 @@ def main():
     num_layers_list = [3, 4, 5, 6]
     batch_size_list = [16, 32, 64, 128, 256]
     learning_rate_list = [0.0001, 0.001, 0.01, 0.1] 
+    eval(64, 4, 3, 16, 0.0001, 10)
 
-    for d_model in d_model_list:
-        for nhead in nhead_list:
-            for num_layers in num_layers_list:
-                for batch_size in batch_size_list:
-                    for learning_rate in learning_rate_list:
-                        train(d_model, nhead, num_layers, batch_size, learning_rate)
+    # for d_model in d_model_list:
+    #     for nhead in nhead_list:
+    #         for num_layers in num_layers_list:
+    #             for batch_size in batch_size_list:
+    #                 for learning_rate in learning_rate_list:
+    #                     for epoch in range(10):
+    #                         eval(d_model, nhead, num_layers, batch_size, learning_rate, epoch+1)
 
 
 if __name__ == '__main__':
