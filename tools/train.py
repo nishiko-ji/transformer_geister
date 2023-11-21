@@ -42,7 +42,9 @@ def train(d_model, nhead, num_layers, batch_size, learning_rate):
     texts, labels = get_data(data_path)
 
     # データローダーのセットアップ
-    train_dataset = GeisterDataset(texts, labels, vocab_size, max_seq_length)
+    train_texts = texts[:2500]
+    train_labels = labels[:2500]
+    train_dataset = GeisterDataset(train_texts, train_labels, vocab_size, max_seq_length)
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 
     # モデルの設定
@@ -74,11 +76,16 @@ def train(d_model, nhead, num_layers, batch_size, learning_rate):
             print(f'Saved checkpoint at epoch {epoch + 1} to {checkpoint_filename}')
 
 def main():
-    d_model_list= [64, 128, 256]
-    nhead_list = [4, 8]
-    num_layers_list = [3, 4, 5, 6]
-    batch_size_list = [16, 32, 64, 128, 256]
-    learning_rate_list = [0.0001, 0.001, 0.01, 0.1] 
+    # d_model_list= [64, 128, 256]
+    # nhead_list = [4, 8]
+    # num_layers_list = [3, 4, 5, 6]
+    # batch_size_list = [16, 32, 64, 128, 256]
+    learning_rate_list = [0.00001, 0.0001, 0.001, 0.01, 0.1] 
+    d_model_list= [256]
+    nhead_list = [8]
+    num_layers_list = [6]
+    batch_size_list = [16]
+    # learning_rate_list = [0.0001] 
 
     for d_model in d_model_list:
         for nhead in nhead_list:
