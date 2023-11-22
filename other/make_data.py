@@ -36,6 +36,7 @@ def make_data_txt2(data_dir, data_name, log_dir, log_files):
                 
             # f.write(f'{log.red_pos0} {log.red_pos1} {moves}\n')
             print(f'{l},<sep>,{l2},<sep>,{moves}\n')
+            f.write(f'{l},<sep>,{l2},<sep>,{moves}\n')
 
 # def make_data_csv(data_dir, data_name, log_dir, log_files):
 #     with open(f'{data_dir}{data_name}.csv', 'w', encoding='UTF-8') as f:
@@ -55,8 +56,8 @@ def main():
             'Naotti_Naotti',
             ]
     for data_name in data_names:
-        log_dir = f'log/{data_name}/log/'
-        data_dir = 'data/'
+        log_dir = f'../log/{data_name}/log/'
+        data_dir = '../data/'
         log_files = os.listdir(log_dir)
         make_data_txt(data_dir, data_name, log_dir, log_files)
         # make_data_csv(data_dir, data_name, log_dir, log_files)

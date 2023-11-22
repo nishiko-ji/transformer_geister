@@ -6,6 +6,7 @@ from sklearn.metrics import classification_report, hamming_loss, jaccard_score, 
 
 import os
 import numpy as np
+import pandas as pd
 
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
@@ -30,6 +31,7 @@ def get_data(path):
 def eval(d_model, nhead, num_layers, batch_size, learning_rate, epoch):
     # torch.cuda.init()
     vocab_size = 84 # 語彙数
+    # vocab_size = 72 # new
     # d_model = 256   # 隠れ層の次元数（256, 512, 1024）
     # nhead = 8   # Attention head (4, 8)
     # num_layers = 6  # エンコーダ層の数(3〜6)
@@ -38,6 +40,7 @@ def eval(d_model, nhead, num_layers, batch_size, learning_rate, epoch):
     # learning_rate = 0.0001  # 学習率（0.0001, 0.001, 0.01, 0.1）
     # num_epochs = 10    # epoch数
     max_seq_length = 206    # 最大入力長
+    # max_seq_length = 220    # new
     data_path = './data/hayazashi_Naotti.txt'
     checkpoint_dir = './checkpoints/'
 
@@ -108,6 +111,24 @@ def eval(d_model, nhead, num_layers, batch_size, learning_rate, epoch):
     print("ハミング損失:", hamming_loss_value)
     print("ジャッカード類似度:", jaccard_similarity)
 
+    # 多ラベル混同行列
+    # conf_matrix_df = pd.DataFrame(conf_matrix, columns=['TN', 'FP', 'FN', 'TP'])
+    # 各行列をDataFrameに変換
+    # conf_matrix_dfs = [pd.DataFrame(matrix.reshape((2, 2)), columns=['Predicted 0', 'Predicted 1', 'Actual 0', 'Actual 1']) for matrix in conf_matrix]
+    # conf_matrix_dfs = [pd.DataFrame(matrix, columns=['Predicted 0', 'Predicted 1', 'Actual 0', 'Actual 1']) for matrix in conf_matrix]
+    conf_matrix_dfs = [pd.DataFrame(matrix.reshape(1, -1), columns=['Predicted 0', 'Predicted 1', 'Actual 0', 'Actual 1']) for matrix in conf_matrix]
+    # 各DataFrameを連結
+    conf_matrix_df = pd.concat(conf_matrix_dfs, keys=['Class 0', 'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7'])
+    conf_matrix_df.to_csv('confusion_matrix.csv', index=False)
+
+    # 分類レポート
+    report_df = pd.DataFrame.from_dict(classification_report(np.array(all_ground_truth), np.array(all_predictions), target_names=class_names, output_dict=True))
+    report_df.to_csv('classification_report.csv')
+
+    # ハミング損失とジャッカード類似度
+    metrics_df = pd.DataFrame({'Hamming Loss': [hamming_loss_value], 'Jaccard Similarity': [jaccard_similarity]})
+    metrics_df.to_csv('metrics.csv', index=False)
+
 def main():
     d_model_list= [64, 128, 256]
     nhead_list = [4, 8]
@@ -115,11 +136,14 @@ def main():
     batch_size_list = [16, 32, 64, 128, 256]
     # learning_rate_list = [0.0001, 0.001, 0.01, 0.1] 
     learning_rate_list = [0.00001, 0.0001, 0.001] 
-    for ln in learning_rate_list:
-        for epoch in range(10):
-            print(f'---epoch: {epoch+1}---')
-            eval(256, 8, 6, 16, ln, epoch+1)
+    # for ln in learning_rate_list:
+    #     for epoch in range(10):
+    #         print(f'---epoch: {epoch+1}---')
+    #         eval(256, 8, 6, 16, ln, epoch+1)
 
+    for epoch in range(10):
+        print(f'---epoch: {epoch+1}---')
+        eval(256, 8, 6, 16, 0.0001, epoch+1)
     # eval(256, 8, 6, 16, 0.001, 10)
     # for d_model in d_model_list:
     #     for nhead in nhead_list:

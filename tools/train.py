@@ -28,6 +28,7 @@ def get_data(path):
 def train(d_model, nhead, num_layers, batch_size, learning_rate):
     # torch.cuda.init()
     vocab_size = 84 # 語彙数
+    # vocab_size = 72 # new
     # d_model = 256   # 隠れ層の次元数（256, 512, 1024）
     # nhead = 8   # Attention head (4, 8)
     # num_layers = 6  # エンコーダ層の数(3〜6)
@@ -36,6 +37,7 @@ def train(d_model, nhead, num_layers, batch_size, learning_rate):
     # learning_rate = 0.0001  # 学習率（0.0001, 0.001, 0.01, 0.1）
     num_epochs = 10    # epoch数
     max_seq_length = 206    # 最大入力長
+    # max_seq_length = 220    # new
     data_path = './data/hayazashi_Naotti.txt'
     checkpoint_dir = './checkpoints/'
 
@@ -62,6 +64,8 @@ def train(d_model, nhead, num_layers, batch_size, learning_rate):
 
     for epoch in range(num_epochs):
         model.train()
+        train_loss = 0.0
+        num_batches = 0
         for batch_input, batch_labels in train_loader:
             batch_input, batch_labels = batch_input.to(device), batch_labels.to(device)
             optimizer.zero_grad()
@@ -69,6 +73,12 @@ def train(d_model, nhead, num_layers, batch_size, learning_rate):
             loss = criterion(outputs, batch_labels)
             loss.backward()
             optimizer.step()
+
+            train_loss += loss.item()
+            num_batches += 1
+
+        average_train_loss = train_loss / num_batches
+        print(f'Epoch {epoch +1}, Average Training Loss: {average_train_loss}')
 
         if (epoch + 1) % save_interval == 0:
             checkpoint_filename = os.path.join(checkpoint_dir, f'ckpt_dmodel_{d_model}_nhead_{nhead}_numlayers_{num_layers}_batch_{batch_size}_rate_{str(learning_rate)[2:]}_epoch_{epoch+1}.pt')
@@ -80,7 +90,7 @@ def main():
     # nhead_list = [4, 8]
     # num_layers_list = [3, 4, 5, 6]
     # batch_size_list = [16, 32, 64, 128, 256]
-    learning_rate_list = [0.00001, 0.0001, 0.001, 0.01, 0.1] 
+    learning_rate_list = [0.00001, 0.0001, 0.001] 
     d_model_list= [256]
     nhead_list = [8]
     num_layers_list = [6]

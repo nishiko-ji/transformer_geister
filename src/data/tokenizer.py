@@ -28,7 +28,9 @@ class GeisterTokenizer():
 
         """
         special_tokens = ['<sos>', '<eos>', '<pad>', '<unk>']   # 特殊トークンリスト
+        # special_tokens = ['<sos>', '<eos>', '<sep>', '<pad>', '<unk>']   # 特殊トークンリスト
         token_list = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']   # コマ名リスト
+        # token_list = ['r', 'b', 'u']   # new
         # 棋譜のトークン化
         for player in ['0', '1']:
             for koma in ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']:
@@ -107,8 +109,9 @@ class GeisterTokenizer():
 
 if __name__ == '__main__':
     tokenizer = GeisterTokenizer()  
-    tokens = tokenizer.tokenize('A,D,F,G,0AN,1AN,0AN,1DE,0AN,1CE,0BW,1AN,0CW,1AW,0CN,1AN,0DN,1AN,0HE,1CN,0CE,1CN,0BN,1BW,0DN,1BW,0DN,1EN,0EN,1BN,0FN,1EW,0CE,1DN,0EW,1FN,0CS,1BN,0EE,1FN,0GN,1FN,0ES,1BS,0FN,1FW,0CS,1FN,0CN,1GN,0FN,1BN,0FE,1BS,0FN,1BN,0FN,1BS,0FE,1BN,0FE,1ES,0BN,1DN,0BN,1DN,0BS,1GN,0BN,1DN,0BN,1DE', 200)
-    print(tokens)
-    print(tokenizer.convert_tokens_to_ids(tokens))
-    print(len(tokenizer.convert_tokens_to_ids(tokens)))
+    tokenizer.print_vocab()
+    # tokens = tokenizer.tokenize('A,D,F,G,0AN,1AN,0AN,1DE,0AN,1CE,0BW,1AN,0CW,1AW,0CN,1AN,0DN,1AN,0HE,1CN,0CE,1CN,0BN,1BW,0DN,1BW,0DN,1EN,0EN,1BN,0FN,1EW,0CE,1DN,0EW,1FN,0CS,1BN,0EE,1FN,0GN,1FN,0ES,1BS,0FN,1FW,0CS,1FN,0CN,1GN,0FN,1BN,0FE,1BS,0FN,1BN,0FN,1BS,0FE,1BN,0FE,1ES,0BN,1DN,0BN,1DN,0BS,1GN,0BN,1DN,0BN,1DE', 200)
+    # print(tokens)
+    # print(tokenizer.convert_tokens_to_ids(tokens))
+    # print(len(tokenizer.convert_tokens_to_ids(tokens)))
 
