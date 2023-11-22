@@ -85,15 +85,25 @@ class KifuViewer(tk.Frame):
         #     self.viewer.create_line(i*100, 0, i*100, self.BAN_SIZE_Y)
         #     self.viewer.create_line(0, i*100, self.BAN_SIZE_X, i*100)
         # self.viewer.create_rectangle(0, 0, self.MASU_SIZE, self.MASU_SIZE, fill='green')
-        for y in range(7):
-            for x in range(7):
+        for y in range(6):
+            for x in range(6):
                 sx, sy = x*self.MASU_SIZE, y*self.MASU_SIZE
                 ex, ey = (x+1)*self.MASU_SIZE, (y+1)*self.MASU_SIZE
                 # self.viewer.create_rectangle(x*self.MASU_SIZE, y*self.MASU_SIZE, (x+1)*self.MASU_SIZE, (y+1)*self.MASU_SIZE, fill='white')
                 self.viewer.create_rectangle(sx, sy, ex, ey, fill='white')
                 if self.log != None:
-                    self.viewer.create_text((sx+ex)/2, (sy+ey)/2, text=self.log.get_board_index(3)[y][x])
-                    print(self.log.get_board_index(self.sel_move[0]))
+                    name = self.log.get_board_index(self.sel_move[0])[y][x]
+                    if name in ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']:
+                        if name in self.log.red_pos0:
+                            self.viewer.create_polygon((sx+ex)/2, sy, sx, ey, ex, ey, fill = 'red')
+                        else:
+                            self.viewer.create_polygon((sx+ex)/2, sy, sx, ey, ex, ey, fill = 'blue')
+                    if name in ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']:
+                        if name in self.log.red_pos1:
+                            self.viewer.create_polygon(sx, sy, ex, sy, (sx+ex)/2, ey, fill = 'red')
+                        else:
+                            self.viewer.create_polygon(sx, sy, ex, sy, (sx+ex)/2, ey, fill = 'blue')
+                    self.viewer.create_text((sx+ex)/2, (sy+ey)/2, text=name)
         self.viewer.place(x=20,y=40)    # 位置調整
         self.master.bind('<space>', self.move)
 

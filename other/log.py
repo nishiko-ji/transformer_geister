@@ -273,8 +273,21 @@ class Log:
             pieces = copy.deepcopy(self.pieces_list[-1])
             if move[0] == '0':
                 pieces[move[1]].move(int(move[0]), move[2])
+                pos = pieces[move[1]].get_pos()
+                for k, v in pieces.items():
+                    if v.get_pos() == pos:
+                        pieces[k].set_pos(9, 9)
+                pieces[move[1]].set_pos(pos[0], pos[1])
+                # もし、pieces[move[1]]がゴールしたら、その駒の座標を(8, 8)へ
             elif move[0] == '1':
                 pieces[move[1].lower()].move(int(move[0]), move[2])
+                pos = pieces[move[1].lower()].get_pos()
+                for k, v in pieces.items():
+                    if v.get_pos() == pos:
+                        pieces[k].set_pos(9, 9)
+                pieces[move[1].lower()].set_pos(pos[0], pos[1])
+                # もし、pieces[move[1]]に駒があったら、その駒の座標を(9, 9)へ
+                # もし、pieces[move[1]]がゴールしたら、その駒の座標を(8, 8)へ
             self.pieces_list.append(pieces)
 
         return True
@@ -299,7 +312,10 @@ class Log:
         board = [['x' for _ in range(6)] for _ in range(6)]
         for k, v in self.pieces_list[idx].items():
             idx = v.get_pos()
-            board[idx[1]][idx[0]] = k
+            if idx[0] == 9 or idx[0] == 8:
+               print() 
+            else:
+                board[idx[1]][idx[0]] = k
         return board
 
     def get_board(self, index: int) -> list[list[str]]:
