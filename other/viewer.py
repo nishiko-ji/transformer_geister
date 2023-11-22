@@ -74,8 +74,8 @@ class KifuViewer(tk.Frame):
         self.moves_listbox['yscrollcommand'] = self.moves_scroll_y.set
         self.moves_listbox.grid(row=0, column=0)
         self.moves_scroll_y.grid(row=0, column=1, sticky='nsw')
-        if self.dir_path != './':
-            self.moves_listbox.bind('<<ListboxSelect>>', lambda e: self.select_move())
+        # if self.dir_path != './':
+        self.moves_listbox.bind('<<ListboxSelect>>', lambda e: self.select_move())
 
     def draw_file_name(self):
         self.label.place(x=20, y=20)
@@ -92,8 +92,8 @@ class KifuViewer(tk.Frame):
                 # self.viewer.create_rectangle(x*self.MASU_SIZE, y*self.MASU_SIZE, (x+1)*self.MASU_SIZE, (y+1)*self.MASU_SIZE, fill='white')
                 self.viewer.create_rectangle(sx, sy, ex, ey, fill='white')
                 if self.log != None:
-                    # self.viewer.create_text((sx+ex)/2, (sy+ey)/2, text=self.log.get_board_index(3)[y][x])
-                    print(self.log.get_board_index(self.sel_move))
+                    self.viewer.create_text((sx+ex)/2, (sy+ey)/2, text=self.log.get_board_index(3)[y][x])
+                    print(self.log.get_board_index(self.sel_move[0]))
         self.viewer.place(x=20,y=40)    # 位置調整
         self.master.bind('<space>', self.move)
 
@@ -107,9 +107,9 @@ class KifuViewer(tk.Frame):
         self.open_folder()
 
     def open_folder(self):
-        self.moves_listbox.delete(0, tk.END)
+        self.files_listbox.delete(0, tk.END)
         files_file = [ f for f in os.listdir(self.dir_path) if os.path.isfile(os.path.join(self.dir_path, f)) ]
-        print(files_file)
+        # print(files_file)
         for name in files_file:
             if(name.startswith('log') and name.endswith('.txt')):
                 self.files_listbox.insert(tk.END, name)
@@ -121,11 +121,14 @@ class KifuViewer(tk.Frame):
 
     def select_move(self):
         self.sel_move = self.moves_listbox.curselection()
+        self.draw_ban()
         # self.label['text'] = 'File Name : ' + sel_move[0]
-        # print(sel_move[0])
+        # print('bb')
 
     def open_kifu(self, path):
         self.log = Log(path)
+        self.log.init_pieces_list()
+        self.log.to_pieces_list()
         # with open(path, 'r', encoding='utf-8') as f:
         #     lines = f.read().split('\n')
         lines = self.log.get_moves()
