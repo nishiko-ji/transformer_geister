@@ -13,6 +13,8 @@ Todo:
 
 import pprint # 配列表示に利用
 import copy
+import itertools
+
 import piece
 
 
@@ -305,7 +307,10 @@ class Log:
             board = [['x' for _ in range(6)] for _ in range(6)]
             for k, v in pieces.items():
                 idx = v.get_pos()
-                board[idx[1]][idx[0]] = k
+                if idx[0] == 9 or idx[0] == 8:
+                    print() 
+                else:
+                    board[idx[1]][idx[0]] = k
             pprint.pprint(board)
                 
     def get_board_index(self, idx):
@@ -351,6 +356,14 @@ class Log:
         """
         return self.boards[:index]
 
+    def get_board_index_1line(self, index: int):
+        return list(itertools.chain.from_iterable(self.get_board_index(index)))
+
+    def get_color_fin(self) -> dict[str, str]:
+        color = {}
+        color['A'] = 'r'
+        return color
+
     # def to_sendstr(self, move_num):
     #     """ 任意の手数の受信文字列を復元する"""
     #     print('move_num番目の受信文字列')
@@ -366,14 +379,20 @@ class Log:
 
 def main():
     """ メイン関数 """
-    log = Log('./log/Naotti_Naotti/log/log-2023-11-02-10-41-31-973.txt')  # ログファイル読み込み
+    log = Log('../log/Naotti_hayazashi/log/log-2023-10-31-01-38-22-946.txt')  # ログファイル読み込み
     # log.print_log() # ログ配列確認
     # print(log.make_data())
     # print(log.get_moves_index(0))
     log.init_pieces_list()
     log.to_pieces_list()
-    # log.print_pieces_list()
+    log.print_pieces_list()
     log.print_board()
+    pprint.pprint(log.get_board_index(63))
+    # log.get_board_index_1line(9)
+    # pprint.pprint(log.get_board_index(1))
+    # log.get_board_index_1line(1)
+    # pprint.pprint(log.get_board_index(2))
+    # log.get_board_index_1line(2)
 
 
 if __name__ == '__main__':
