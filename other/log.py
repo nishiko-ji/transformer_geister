@@ -271,6 +271,7 @@ class Log:
             bool: 復元できたらTrue
 
         """
+        # pieces = copy.deepcopy(self.pieces_list[-1])
         for move in self.moves:
             pieces = copy.deepcopy(self.pieces_list[-1])
             if move[0] == '0':
@@ -279,17 +280,21 @@ class Log:
                 for k, v in pieces.items():
                     if v.get_pos() == pos:
                         pieces[k].set_pos(9, 9)
-                pieces[move[1]].set_pos(pos[0], pos[1])
-                # もし、pieces[move[1]]がゴールしたら、その駒の座標を(8, 8)へ
+                if pos[0] == -1 or pos[0] == 7:
+                    pieces[move[1]].set_pos(8, 8)
+                else:
+                    pieces[move[1]].set_pos(pos[0], pos[1])
+
             elif move[0] == '1':
                 pieces[move[1].lower()].move(int(move[0]), move[2])
                 pos = pieces[move[1].lower()].get_pos()
                 for k, v in pieces.items():
                     if v.get_pos() == pos:
                         pieces[k].set_pos(9, 9)
-                pieces[move[1].lower()].set_pos(pos[0], pos[1])
-                # もし、pieces[move[1]]に駒があったら、その駒の座標を(9, 9)へ
-                # もし、pieces[move[1]]がゴールしたら、その駒の座標を(8, 8)へ
+                if pos[0] == -1 or pos[0] == 7:
+                    pieces[move[1].lower()].set_pos(8, 8)
+                else:
+                    pieces[move[1].lower()].set_pos(pos[0], pos[1])
             self.pieces_list.append(pieces)
 
         return True
@@ -298,7 +303,7 @@ class Log:
         for pieces in self.pieces_list:
             print('---pieces---')
             for k, v in pieces.items():
-                print(f'{k}: {v.get_pos()}')
+                print(f'{k}: {v.get_pos()}, {v.get_color()}')
             print('------------')
             print()
 
@@ -385,9 +390,11 @@ def main():
     # print(log.get_moves_index(0))
     log.init_pieces_list()
     log.to_pieces_list()
-    log.print_pieces_list()
-    log.print_board()
-    pprint.pprint(log.get_board_index(63))
+    # log.print_pieces_list()
+    # log.print_board()
+    pprint.pprint(log.get_board_index(56))
+    pprint.pprint(log.get_board_index(57))
+    pprint.pprint(log.get_board_index(58))
     # log.get_board_index_1line(9)
     # pprint.pprint(log.get_board_index(1))
     # log.get_board_index_1line(1)
