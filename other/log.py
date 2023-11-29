@@ -280,7 +280,7 @@ class Log:
                 for k, v in pieces.items():
                     if v.get_pos() == pos:
                         pieces[k].set_pos(9, 9)
-                if pos[0] == -1 or pos[0] == 7:
+                if pos[0] == -1 or pos[0] == 6:
                     pieces[move[1]].set_pos(8, 8)
                 else:
                     pieces[move[1]].set_pos(pos[0], pos[1])
@@ -291,7 +291,7 @@ class Log:
                 for k, v in pieces.items():
                     if v.get_pos() == pos:
                         pieces[k].set_pos(9, 9)
-                if pos[0] == -1 or pos[0] == 7:
+                if pos[0] == -1 or pos[0] == 6:
                     pieces[move[1].lower()].set_pos(8, 8)
                 else:
                     pieces[move[1].lower()].set_pos(pos[0], pos[1])
@@ -313,7 +313,7 @@ class Log:
             for k, v in pieces.items():
                 idx = v.get_pos()
                 if idx[0] == 9 or idx[0] == 8:
-                    print() 
+                    pass
                 else:
                     board[idx[1]][idx[0]] = k
             pprint.pprint(board)
@@ -323,8 +323,20 @@ class Log:
         for k, v in self.pieces_list[idx].items():
             idx = v.get_pos()
             if idx[0] == 9 or idx[0] == 8:
-               print() 
+                pass
             else:
+                board[idx[1]][idx[0]] = k
+        return board
+
+    def get_board_last(self):
+        board = [['x' for _ in range(6)] for _ in range(6)]
+
+        for k, v in self.pieces_list[-1].items():
+            idx = v.get_pos()
+            if idx[0] == 9 or idx[0] == 8:
+                pass
+            else:
+                print(f'({idx[1]}, {idx[0]} -> {k})')
                 board[idx[1]][idx[0]] = k
         return board
 
@@ -364,10 +376,21 @@ class Log:
     def get_board_index_1line(self, index: int):
         return list(itertools.chain.from_iterable(self.get_board_index(index)))
 
-    def get_color_fin(self) -> dict[str, str]:
-        color = {}
-        color['A'] = 'r'
-        return color
+    def get_board_last_1line(self):
+        return list(itertools.chain.from_iterable(self.get_board_last()))
+
+    def get_colors_last(self) -> dict[str, str]:
+        pieces = self.pieces_list[-1]
+        enemy_colors = {}
+        for n in ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']:
+            enemy_piece = pieces[n]
+            enemy_pos = enemy_piece.get_pos()
+            if enemy_pos[0] == 8 or enemy_pos[0] == 9:
+                enemy_colors[n] = enemy_piece.get_color()
+            else:
+                enemy_colors[n] = 'u'
+        return enemy_colors
+
 
     # def to_sendstr(self, move_num):
     #     """ 任意の手数の受信文字列を復元する"""
@@ -390,16 +413,11 @@ def main():
     # print(log.get_moves_index(0))
     log.init_pieces_list()
     log.to_pieces_list()
-    # log.print_pieces_list()
+    log.print_pieces_list()
     # log.print_board()
-    pprint.pprint(log.get_board_index(56))
-    pprint.pprint(log.get_board_index(57))
-    pprint.pprint(log.get_board_index(58))
-    # log.get_board_index_1line(9)
-    # pprint.pprint(log.get_board_index(1))
-    # log.get_board_index_1line(1)
-    # pprint.pprint(log.get_board_index(2))
-    # log.get_board_index_1line(2)
+    pprint.pprint(log.get_board_last())
+    print(log.get_board_last_1line())
+    pprint.pprint(log.get_colors_last())
 
 
 if __name__ == '__main__':

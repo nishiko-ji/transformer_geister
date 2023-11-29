@@ -28,7 +28,7 @@ class GeisterTokenizer():
 
         """
         special_tokens = ['<sos>', '<eos>', '<pad>', '<unk>']   # 特殊トークンリスト
-        # special_tokens = ['<sos>', '<eos>', '<sep>', '<pad>', '<unk>']   # 特殊トークンリスト
+        # special_tokens = ['<sos>', '<eos>', '<sep>', '<pad>', '<unk>']   # new
         token_list = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']   # コマ名リスト
         # token_list = ['r', 'b', 'u']   # new
         # 棋譜のトークン化

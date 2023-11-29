@@ -24,6 +24,19 @@ def get_data(path):
 
     return texts, labels
 
+def get_data2(path):
+    texts = []
+    labels = []
+    with open(path, 'r') as f:
+        for line in f:
+            data = line.rstrip('\n').split(' ')
+            red_pos0 = data[0]
+            texts.append(f'{red_pos0},{data[2]}')
+            red_pos1 = data[1]
+            labels.append(red_pos1)
+
+    return texts, labels
+
 
 def train(d_model, nhead, num_layers, batch_size, learning_rate):
     # torch.cuda.init()
@@ -36,8 +49,8 @@ def train(d_model, nhead, num_layers, batch_size, learning_rate):
     # batch_size = 128    # バッチサイズ（16, 32, 64, 128）
     # learning_rate = 0.0001  # 学習率（0.0001, 0.001, 0.01, 0.1）
     num_epochs = 10    # epoch数
-    max_seq_length = 206    # 最大入力長
-    # max_seq_length = 220    # new
+    # max_seq_length = 206    # 最大入力長
+    max_seq_length = 220    # new
     data_path = './data/hayazashi_Naotti.txt'
     checkpoint_dir = './checkpoints/'
 

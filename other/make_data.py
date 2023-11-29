@@ -16,6 +16,8 @@ def make_data_txt2(data_dir, data_name, log_dir, log_files):
         for file in log_files:
             log = Log(log_dir+file)
             log.read_log()
+            log.init_pieces_list()
+            log.to_pieces_list()
             moves = ','.join(log.moves)
             label = []
             for l in ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']:
@@ -24,11 +26,13 @@ def make_data_txt2(data_dir, data_name, log_dir, log_files):
                 else:
                     label.append('b')
             label2 = []
+            en_colors = log.get_colors_last()
             for l in ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']:
-                if l in log.red_pos1:
-                    label2.append('r')
-                else:
-                    label2.append('b')
+                label2.append(en_colors[l])
+                # if l in log.red_pos1:
+                #     label2.append('r')
+                # else:
+                #     label2.append('b')
             print(label)
             print(label2)
             l = ','.join(label)
@@ -42,6 +46,8 @@ def make_data_txt3(data_dir, data_name, log_dir, log_files):
         for file in log_files:
             log = Log(log_dir+file)
             log.read_log()
+            log.init_pieces_list()
+            log.to_pieces_list()
             moves = ','.join(log.moves)
             label = []
             for l in ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']:
@@ -50,18 +56,22 @@ def make_data_txt3(data_dir, data_name, log_dir, log_files):
                 else:
                     label.append('b')
             label2 = []
+            en_colors = log.get_colors_last()
             for l in ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']:
-                if l in log.red_pos1:
-                    label2.append('r')
-                else:
-                    label2.append('b')
+                label2.append(en_colors[l])
+                # if l in log.red_pos1:
+                #     label2.append('r')
+                # else:
+                #     label2.append('b')
+            board = ','.join(log.get_board_last_1line())
+            print(board)
             print(label)
             print(label2)
             l = ','.join(label)
             l2 = ','.join(label2)
                 
             print(f'{l} {l2} {moves}\n')
-            f.write(f'{l} {l2} {moves}\n')
+            f.write(f'{l} {l2} {moves} {board}\n')
 
 def main():
     # data_name = 'Naotti_Naotti'
