@@ -41,7 +41,9 @@ def eval(d_model, nhead, num_layers, batch_size, learning_rate, epoch):
     # num_epochs = 10    # epoch数
     max_seq_length = 206    # 最大入力長
     # max_seq_length = 220    # new
-    data_path = './data/hayazashi_Naotti.txt'
+    # data_path = './data/hayazashi_Naotti.txt'
+    data_path = './data/Naotti_hayazashi.txt'
+    # data_path = './data/Naotti_Naotti.txt'
     checkpoint_dir = './checkpoints/'
 
     texts, labels = get_data(data_path)
@@ -119,39 +121,44 @@ def eval(d_model, nhead, num_layers, batch_size, learning_rate, epoch):
     conf_matrix_dfs = [pd.DataFrame(matrix.reshape(1, -1), columns=['Predicted 0', 'Predicted 1', 'Actual 0', 'Actual 1']) for matrix in conf_matrix]
     # 各DataFrameを連結
     conf_matrix_df = pd.concat(conf_matrix_dfs, keys=['Class 0', 'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7'])
-    conf_matrix_df.to_csv('confusion_matrix.csv', index=False)
+    conf_matrix_df.to_csv(f'confusion_matrix_{d_model}_{nhead}_{num_layers}_{batch_size}_{str(learning_rate)[:2]}_{epoch}.csv', index=False)
 
     # 分類レポート
     report_df = pd.DataFrame.from_dict(classification_report(np.array(all_ground_truth), np.array(all_predictions), target_names=class_names, output_dict=True))
-    report_df.to_csv('classification_report.csv')
+    report_df.to_csv(f'classification_report_{d_model}_{nhead}_{num_layers}_{batch_size}_{str(learning_rate)[:2]}_{epoch}.csv')
 
     # ハミング損失とジャッカード類似度
     metrics_df = pd.DataFrame({'Hamming Loss': [hamming_loss_value], 'Jaccard Similarity': [jaccard_similarity]})
-    metrics_df.to_csv('metrics.csv', index=False)
+    metrics_df.to_csv(f'metrics_{d_model}_{nhead}_{num_layers}_{batch_size}_{str(learning_rate)[:2]}_{epoch}.csv', index=False)
 
 def main():
+    # d_model_list= [64, 128, 256]
+    # nhead_list = [4, 8]
+    # num_layers_list = [3, 4, 5, 6]
+    # batch_size_list = [16, 32, 64, 128, 256]
+    # learning_rate_list = [0.0001, 0.001, 0.01, 0.1] 
+    # learning_rate_list = [0.00001, 0.0001, 0.001] 
     d_model_list= [64, 128, 256]
     nhead_list = [4, 8]
-    num_layers_list = [3, 4, 5, 6]
-    batch_size_list = [16, 32, 64, 128, 256]
-    # learning_rate_list = [0.0001, 0.001, 0.01, 0.1] 
-    learning_rate_list = [0.00001, 0.0001, 0.001] 
+    num_layers_list = [3, 6]
+    batch_size_list = [16, 32, 64]
+    learning_rate_list = [0.00001, 0.0001] 
     # for ln in learning_rate_list:
     #     for epoch in range(10):
     #         print(f'---epoch: {epoch+1}---')
     #         eval(256, 8, 6, 16, ln, epoch+1)
 
-    for epoch in range(10):
-        print(f'---epoch: {epoch+1}---')
-        eval(256, 8, 6, 16, 0.0001, epoch+1)
+    # for epoch in range(10):
+    #     print(f'---epoch: {epoch+1}---')
+    #     eval(256, 8, 6, 16, 0.0001, epoch+1)
     # eval(256, 8, 6, 16, 0.001, 10)
-    # for d_model in d_model_list:
-    #     for nhead in nhead_list:
-    #         for num_layers in num_layers_list:
-    #             for batch_size in batch_size_list:
-    #                 for learning_rate in learning_rate_list:
-    #                     for epoch in range(10):
-    #                         eval(d_model, nhead, num_layers, batch_size, learning_rate, epoch+1)
+    for d_model in d_model_list:
+        for nhead in nhead_list:
+            for num_layers in num_layers_list:
+                for batch_size in batch_size_list:
+                    for learning_rate in learning_rate_list:
+                        for epoch in range(20):
+                            eval(d_model, nhead, num_layers, batch_size, learning_rate, epoch+1)
 
 
 if __name__ == '__main__':
