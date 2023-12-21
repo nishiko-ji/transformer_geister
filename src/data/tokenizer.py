@@ -18,6 +18,14 @@ class GeisterTokenizer():
         """
         self.vocab = self.make_vocab()
 
+    def select_vocab(self, i: int):
+        if i == 0:
+            self.vocab = self.make_vocab()
+        elif i == 1:
+            self.vocab = self.make_vocab2()
+        else:
+            print("Error")
+
     def make_vocab(self) -> dict[str, int]:
         """ vocab(トークンとIDの辞書)を作成
 
@@ -28,9 +36,30 @@ class GeisterTokenizer():
 
         """
         special_tokens = ['<sos>', '<eos>', '<pad>', '<unk>']   # 特殊トークンリスト
-        # special_tokens = ['<sos>', '<eos>', '<sep>', '<pad>', '<unk>']   # new
         token_list = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']   # コマ名リスト
-        # token_list = ['r', 'b', 'u']   # new
+        # 棋譜のトークン化
+        for player in ['0', '1']:
+            for koma in ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']:
+                for direction in ['E', 'W', 'S', 'N']:
+                    token_list.append(f'{player}{koma}{direction}')
+        vocab = {}
+        # 辞書化
+        for i, data in enumerate(special_tokens+token_list):
+            vocab[data] = i
+
+        return vocab
+
+    def make_vocab2(self) -> dict[str, int]:
+        """ vocab(トークンとIDの辞書)を作成
+
+        トークン(str)とID(int)の辞書で語彙を表現する。
+
+        Returns:
+            dict[str, int]: トークンとIDの辞書(vocab)
+
+        """
+        special_tokens = ['<sos>', '<eos>', '<sep>', '<pad>', '<unk>']   # new
+        token_list = ['r', 'b', 'u']   # new
         # 棋譜のトークン化
         for player in ['0', '1']:
             for koma in ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']:

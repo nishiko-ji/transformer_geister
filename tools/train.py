@@ -5,6 +5,7 @@ import torch.optim as optim
 
 import os
 import time
+import pprint
 
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
@@ -32,7 +33,7 @@ def get_data2(path):
         for line in f:
             data = line.rstrip('\n').split(' ')
             red_pos0 = data[0]
-            texts.append(f'{red_pos0},{data[2]}')
+            texts.append(f'{red_pos0},<sep>,{data[2]}')
             red_pos1 = data[1]
             labels.append(red_pos1)
 
@@ -41,8 +42,8 @@ def get_data2(path):
 
 def train(d_model, nhead, num_layers, batch_size, learning_rate):
     # torch.cuda.init()
-    vocab_size = 84 # 語彙数
-    # vocab_size = 72 # new
+    # vocab_size = 84 # 語彙数
+    vocab_size = 72 # new
     # d_model = 256   # 隠れ層の次元数（256, 512, 1024）
     # nhead = 8   # Attention head (4, 8)
     # num_layers = 6  # エンコーダ層の数(3〜6)
@@ -54,17 +55,23 @@ def train(d_model, nhead, num_layers, batch_size, learning_rate):
     max_seq_length = 220    # new
     # data_path = './data/hayazashi_Naotti.txt'
     # data_path = './data/Naotti_hayazashi.txt'
-    data_path = './data/Naotti_Naotti.txt'
+    # data_path = './data/Naotti_Naotti.txt'
+    # data_path = './data/hayazashi_Naotti2.txt'
+    # data_path = './data/Naotti_hayazashi2.txt'
+    data_path = './data/Naotti_Naotti2.txt'
     checkpoint_dir = './checkpoints/'
 
-    texts, labels = get_data(data_path)
+    texts, labels = get_data2(data_path)
 
     # データローダーのセットアップ
     train_texts = texts[:2500]
     train_labels = labels[:2500]
+    # pprint.pprint(f'texts: {train_texts[0:10]}')
+    # pprint.pprint(f'labels: {train_labels[0:10]}')
     train_dataset = GeisterDataset(train_texts, train_labels, vocab_size, max_seq_length)
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-
+    # for i in range(10):
+    #     print(train_dataset[i])
     # モデルの設定
     device = torch.device('cuda:0') if torch.cuda.is_available() else torch.device('cpu')
     print('cuDNNの有効状態：', torch.backends.cudnn.enabled)
@@ -117,6 +124,7 @@ def main():
     # num_layers_list = [6]
     # batch_size_list = [16]
     # learning_rate_list = [0.0001] 
+    # train(256, 8, 6, 64, 0.0001)
 
     for d_model in d_model_list:
         for nhead in nhead_list:
