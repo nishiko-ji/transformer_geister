@@ -121,15 +121,15 @@ def eval(d_model, nhead, num_layers, batch_size, learning_rate, epoch):
     conf_matrix_dfs = [pd.DataFrame(matrix.reshape(1, -1), columns=['Predicted 0', 'Predicted 1', 'Actual 0', 'Actual 1']) for matrix in conf_matrix]
     # 各DataFrameを連結
     conf_matrix_df = pd.concat(conf_matrix_dfs, keys=['Class 0', 'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7'])
-    conf_matrix_df.to_csv(f'confusion_matrix_{d_model}_{nhead}_{num_layers}_{batch_size}_{str(learning_rate)[:2]}_{epoch}.csv', index=False)
+    conf_matrix_df.to_csv(f'confusion_matrix_{d_model}_{nhead}_{num_layers}_{batch_size}_{str(learning_rate)[2:]}_{epoch}.csv', index=False)
 
     # 分類レポート
     report_df = pd.DataFrame.from_dict(classification_report(np.array(all_ground_truth), np.array(all_predictions), target_names=class_names, output_dict=True))
-    report_df.to_csv(f'classification_report_{d_model}_{nhead}_{num_layers}_{batch_size}_{str(learning_rate)[:2]}_{epoch}.csv')
+    report_df.to_csv(f'classification_report_{d_model}_{nhead}_{num_layers}_{batch_size}_{str(learning_rate)[2:]}_{epoch}.csv')
 
     # ハミング損失とジャッカード類似度
     metrics_df = pd.DataFrame({'Hamming Loss': [hamming_loss_value], 'Jaccard Similarity': [jaccard_similarity]})
-    metrics_df.to_csv(f'metrics_{d_model}_{nhead}_{num_layers}_{batch_size}_{str(learning_rate)[:2]}_{epoch}.csv', index=False)
+    metrics_df.to_csv(f'metrics_{d_model}_{nhead}_{num_layers}_{batch_size}_{str(learning_rate)[2:]}_{epoch}.csv', index=False)
 
 def main():
     # d_model_list= [64, 128, 256]
