@@ -28,10 +28,24 @@ def get_data(path):
     return texts, labels
 
 
+def get_data2(path):
+    texts = []
+    labels = []
+    with open(path, 'r') as f:
+        for line in f:
+            data = line.rstrip('\n').split(' ')
+            red_pos0 = data[0]
+            texts.append(f'{red_pos0},<sep>,{data[2]}')
+            red_pos1 = data[1]
+            labels.append(red_pos1)
+
+    return texts, labels
+
 def eval(d_model, nhead, num_layers, batch_size, learning_rate, epoch):
+    print(d_model, nhead, num_layers, batch_size, learning_rate, epoch)
     # torch.cuda.init()
-    vocab_size = 84 # 語彙数
-    # vocab_size = 72 # new
+    #vocab_size = 84 # 語彙数
+    vocab_size = 72 # new
     # d_model = 256   # 隠れ層の次元数（256, 512, 1024）
     # nhead = 8   # Attention head (4, 8)
     # num_layers = 6  # エンコーダ層の数(3〜6)
@@ -39,14 +53,25 @@ def eval(d_model, nhead, num_layers, batch_size, learning_rate, epoch):
     # batch_size = 128    # バッチサイズ（16, 32, 64, 128）
     # learning_rate = 0.0001  # 学習率（0.0001, 0.001, 0.01, 0.1）
     # num_epochs = 10    # epoch数
-    max_seq_length = 206    # 最大入力長
-    # max_seq_length = 220    # new
+    #max_seq_length = 206    # 最大入力長
+    max_seq_length = 220    # new
     # data_path = './data/hayazashi_Naotti.txt'
-    data_path = './data/Naotti_hayazashi.txt'
+    # data_path = './data/Naotti_hayazashi.txt'
     # data_path = './data/Naotti_Naotti.txt'
-    checkpoint_dir = './checkpoints/'
+    #data_path = '../drive/MyDrive/Transformer_Data/data/hayazashi_Naotti3.txt'
+    #data_path = '../drive/MyDrive/Transformer_Data/data/Naotti_hayazashi3.txt'
+    data_path = '../drive/MyDrive/Transformer_Data/data/Naotti_Naotti3.txt'
+    # data_path = './data/Naotti_hayazashi2.txt'
+    # data_path = './data/Naotti_Naotti2.txt'
+    # checkpoint_dir = './checkpoints/'
+    checkpoint_dir = '../drive/MyDrive/Transformer_Data/checkpoints_Naotti_Naotti_U2/'
+    #checkpoint_dir = '../drive/MyDrive/Transformer_Data/checkpoints_Naotti_hayazashi_U2/'
+    #checkpoint_dir = '../drive/MyDrive/Transformer_Data/checkpoints_hayazashi_Naotti_U2/'
+    #eval_dir = '../drive/MyDrive/Transformer_Data/eval/hayazashi_Naotti_U2/'
+    eval_dir = '../drive/MyDrive/Transformer_Data/eval/Naotti_Naotti_U2/'
+    #eval_dir = '../drive/MyDrive/Transformer_Data/eval/Naotti_hayazashi_U2/'
 
-    texts, labels = get_data(data_path)
+    texts, labels = get_data2(data_path)
     eval_texts = texts[2500:]
     eval_labels = labels[2500:]
 
@@ -96,17 +121,19 @@ def eval(d_model, nhead, num_layers, batch_size, learning_rate, epoch):
 
 
     class_names = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+    #print(type(np.array(all_ground_truth)[0][0]))
+    #print(type(np.array(all_predictions)[0][0]))
     # 多ラベル混同行列
-    conf_matrix = multilabel_confusion_matrix(np.array(all_ground_truth), np.array(all_predictions))
+    conf_matrix = multilabel_confusion_matrix(np.array(all_ground_truth, dtype=np.int64), np.array(all_predictions))
 
     # 適合率、再現率、F1値、サポート数
-    report = classification_report(np.array(all_ground_truth), np.array(all_predictions), target_names=class_names)
+    report = classification_report(np.array(all_ground_truth, dtype=np.int64), np.array(all_predictions), target_names=class_names)
 
     # ハミング損失
-    hamming_loss_value = hamming_loss(np.array(all_ground_truth), np.array(all_predictions))
+    hamming_loss_value = hamming_loss(np.array(all_ground_truth, dtype=np.int64), np.array(all_predictions))
 
     # ジャッカード類似度
-    jaccard_similarity = jaccard_score(np.array(all_ground_truth), np.array(all_predictions), average='samples')
+    jaccard_similarity = jaccard_score(np.array(all_ground_truth, dtype=np.int64), np.array(all_predictions), average='samples')
 
     print("多ラベル混同行列:\n", conf_matrix)
     print("分類レポート:\n", report)
@@ -121,15 +148,37 @@ def eval(d_model, nhead, num_layers, batch_size, learning_rate, epoch):
     conf_matrix_dfs = [pd.DataFrame(matrix.reshape(1, -1), columns=['Predicted 0', 'Predicted 1', 'Actual 0', 'Actual 1']) for matrix in conf_matrix]
     # 各DataFrameを連結
     conf_matrix_df = pd.concat(conf_matrix_dfs, keys=['Class 0', 'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7'])
-    conf_matrix_df.to_csv(f'confusion_matrix_{d_model}_{nhead}_{num_layers}_{batch_size}_{str(learning_rate)[2:]}_{epoch}.csv', index=False)
+    conf_matrix_df.to_csv(eval_dir + f'confusion_matrix_{d_model}_{nhead}_{num_layers}_{batch_size}_{str(learning_rate)[2:]}_{epoch}.csv', index=False)
 
     # 分類レポート
-    report_df = pd.DataFrame.from_dict(classification_report(np.array(all_ground_truth), np.array(all_predictions), target_names=class_names, output_dict=True))
-    report_df.to_csv(f'classification_report_{d_model}_{nhead}_{num_layers}_{batch_size}_{str(learning_rate)[2:]}_{epoch}.csv')
+    report_df = pd.DataFrame.from_dict(classification_report(np.array(all_ground_truth, dtype=np.int64), np.array(all_predictions), target_names=class_names, output_dict=True))
+    report_df.to_csv(eval_dir + f'classification_report_{d_model}_{nhead}_{num_layers}_{batch_size}_{str(learning_rate)[2:]}_{epoch}.csv')
 
     # ハミング損失とジャッカード類似度
     metrics_df = pd.DataFrame({'Hamming Loss': [hamming_loss_value], 'Jaccard Similarity': [jaccard_similarity]})
-    metrics_df.to_csv(f'metrics_{d_model}_{nhead}_{num_layers}_{batch_size}_{str(learning_rate)[2:]}_{epoch}.csv', index=False)
+    metrics_df.to_csv(eval_dir + f'metrics_{d_model}_{nhead}_{num_layers}_{batch_size}_{str(learning_rate)[2:]}_{epoch}.csv', index=False)
+
+def eval2(d_model, nhead, num_layers, batch_size, learning_rate, epoch):
+    print(d_model, nhead, num_layers, batch_size, learning_rate, epoch)
+    vocab_size = 72 # new
+    num_classes = 8 # 8ラベル分類
+    max_seq_length = 220    # new
+    #data_path = '../drive/MyDrive/Transformer_Data/data/hayazashi_Naotti3.txt'
+    #data_path = '../drive/MyDrive/Transformer_Data/data/Naotti_hayazashi3.txt'
+    data_path = '../drive/MyDrive/Transformer_Data/data/Naotti_Naotti3.txt'
+    checkpoint_dir = '../drive/MyDrive/Transformer_Data/checkpoints_Naotti_Naotti_U2/'
+    #checkpoint_dir = '../drive/MyDrive/Transformer_Data/checkpoints_Naotti_hayazashi_U2/'
+    #checkpoint_dir = '../drive/MyDrive/Transformer_Data/checkpoints_hayazashi_Naotti_U2/'
+    #eval_dir = '../drive/MyDrive/Transformer_Data/eval/hayazashi_Naotti_U2/'
+    eval_dir = '../drive/MyDrive/Transformer_Data/eval/Naotti_Naotti_U2/'
+    #eval_dir = '../drive/MyDrive/Transformer_Data/eval/Naotti_hayazashi_U2/'
+    texts, labels = get_data2(data_path)
+    eval_texts = texts[2500:]
+    eval_labels = labels[2500:]
+    # for i in range(2500):
+    for i in range(1):
+        print(eval_texts[i])
+        print(eval_labels[i])
 
 def main():
     # d_model_list= [64, 128, 256]
@@ -152,13 +201,17 @@ def main():
     #     print(f'---epoch: {epoch+1}---')
     #     eval(256, 8, 6, 16, 0.0001, epoch+1)
     # eval(256, 8, 6, 16, 0.001, 10)
-    for d_model in d_model_list:
-        for nhead in nhead_list:
-            for num_layers in num_layers_list:
-                for batch_size in batch_size_list:
-                    for learning_rate in learning_rate_list:
-                        for epoch in range(20):
-                            eval(d_model, nhead, num_layers, batch_size, learning_rate, epoch+1)
+
+    """ start all eval """
+    # for d_model in d_model_list:
+    #     for nhead in nhead_list:
+    #         for num_layers in num_layers_list:
+    #             for batch_size in batch_size_list:
+    #                 for learning_rate in learning_rate_list:
+    #                     for epoch in range(20):
+    #                         eval(d_model, nhead, num_layers, batch_size, learning_rate, epoch+1)
+    """ end all eval """
+    eval2(256, 8, 6, 16, 0.00001, 20)
 
 
 if __name__ == '__main__':

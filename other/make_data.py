@@ -56,13 +56,11 @@ def make_data_txt3(data_dir, data_name, log_dir, log_files):
                 else:
                     label.append('b')
             label2 = []
-            en_colors = log.get_colors_last()
             for l in ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']:
-                label2.append(en_colors[l])
-                # if l in log.red_pos1:
-                #     label2.append('r')
-                # else:
-                #     label2.append('b')
+                if l in log.red_pos1:
+                    label2.append('r')
+                else:
+                    label2.append('b')
             board = ','.join(log.get_board_last_1line())
             print(board)
             print(label)
